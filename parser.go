@@ -3,7 +3,6 @@ package ppanalysis
 import (
 	"encoding/json"
 	"io"
-	"io/ioutil"
 
 	"github.com/pkg/errors"
 )
@@ -16,16 +15,9 @@ type AnalysisMessage struct {
 }
 
 func Parse(r io.Reader) (AnalysisBody, error) {
-	body := AnalysisBody{}
-
-	b, err := ioutil.ReadAll(r)
-	if err != nil {
-		return nil, errors.Wrap(err, "parse: ioutil.ReadAll")
+	var body AnalysisBody
+	if err := json.NewDecoder(r).Decode(&body); err != nil {
+		return nil, errors.Wrap(err, "parse: json.Decoder.Decode")
 	}
-	err = json.Unmarshal(b, &body)
-	if err != nil {
-		return nil, errors.Wrap(err, "parse: json.Unmarshal")
-	}
-
 	return body, nil
 }
